@@ -7,18 +7,41 @@ const UseState = ({ name }) => {
   const [deleted, setDeleted] = useState(false);
   const [confirm, setConfirm] = useState(false);
 
+  const onConfirm = () => {
+    setLoading(false);
+    setError(false);
+    setConfirm(true);
+  }
+
+  const onError = () => {
+    setError(true);
+    setLoading(false);
+  }
+  
+  const accept = () => {
+    setLoading( true );
+    setError( false );
+  }
+
+  const onWrite = (e) => {
+    setValue(e.target.value);
+  }
+
+  const home = () => { 
+    setDeleted(false);
+    setConfirm(false); 
+    setValue('');
+  }
+
   const SECURITY_CODE = 'paradigma';
 
   useEffect(() => {
     setTimeout(() => {  
       if (loading){
         if ( value === SECURITY_CODE ){
-          setLoading(false);
-          setError(false);
-          setConfirm(true);
+          onConfirm();
         } else {
-          setError(true);
-          setLoading(false);
+          onError();
         }
       }
     }, 3000)
@@ -34,13 +57,8 @@ const UseState = ({ name }) => {
           { loading && (<p>cargando...</p>) }
           <input placeholder={'codigo de seguridad'}
                  value={value}
-                 onChange={(e) => {
-                   setValue(e.target.value);
-                 }}/>
-          <button onClick={() => {
-              setLoading( true );
-              setError( false );
-          }}> Comprobar </button>
+                 onChange={(e) => onWrite(e)}/>
+          <button onClick={() => accept()}> Comprobar </button>
         </div>
       )
   } else if ( confirm && !deleted){
@@ -50,12 +68,7 @@ const UseState = ({ name }) => {
         <button onClick={() => { setDeleted(true) }}>
           Si eliminar
         </button>
-        <button onClick={
-          () => { 
-            setConfirm(false); 
-            setValue('');
-          }
-          }>
+        <button onClick={() => home()}>
           No me cague
         </button>
       </>
@@ -63,13 +76,7 @@ const UseState = ({ name }) => {
   } else {
     return(<>
       <p>Eliminado con exito</p>
-        <button onClick={
-          () => { 
-            setDeleted(false);
-            setConfirm(false); 
-            setValue('');
-          }
-          }>
+        <button onClick={() => home()}>
           volver al inicio
         </button>
     </>
