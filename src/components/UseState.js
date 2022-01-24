@@ -1,44 +1,44 @@
 import React, {useEffect, useState} from "react";
 
 const UseState = ({ name }) => {
-  const [value,setValue] = useState('');
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-  const [confirm, setConfirm] = useState(false);
+  const [state, setState] = useState({
+    value: '',
+    error: false,
+    loading: false,
+    deleted: false,
+    confirm: false,
+  })
 
   const onConfirm = () => {
-    setLoading(false);
-    setError(false);
-    setConfirm(true);
+    setState({ ...state, loading: false, error: false, confirm: true })
   }
 
   const onError = () => {
-    setError(true);
-    setLoading(false);
+    setState({ ...state, error:true, loading: false })
   }
   
   const accept = () => {
-    setLoading( true );
-    setError( false );
+    setState({ ...state, loading: true, error:false })
   }
 
   const onWrite = (e) => {
-    setValue(e.target.value);
+    setState({ ...state, value: e.target.value })
   }
 
-  const home = () => { 
-    setDeleted(false);
-    setConfirm(false); 
-    setValue('');
+  const onReset = () => { 
+    setState({ ...state, deleted: false, confirm: false })
+  }
+
+  const onDeleted = () => {
+    setState({...state, deleted: true })
   }
 
   const SECURITY_CODE = 'paradigma';
 
   useEffect(() => {
     setTimeout(() => {  
-      if (loading){
-        if ( value === SECURITY_CODE ){
+      if (state.loading){
+        if ( state.value === SECURITY_CODE ){
           onConfirm();
         } else {
           onError();
@@ -46,29 +46,29 @@ const UseState = ({ name }) => {
       }
     }, 3000)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[loading]);
+  },[state.loading]);
 
-  if (!deleted && !confirm) {
+  if (!state.deleted && !state.confirm) {
     return (
         <div>
           <h2>Eliminar {name}</h2>
           <p>por favor escribe el codigo de seguridad</p>
-          { error && (<p>Error el codigo es incorrecto</p>) }
-          { loading && (<p>cargando...</p>) }
+          { state.error && (<p>Error el codigo es incorrecto</p>) }
+          { state.loading && (<p>cargando...</p>) }
           <input placeholder={'codigo de seguridad'}
-                 value={value}
+                 value={state.value}
                  onChange={(e) => onWrite(e)}/>
           <button onClick={() => accept()}> Comprobar </button>
         </div>
       )
-  } else if ( confirm && !deleted){
+  } else if ( state.confirm && !state.deleted){
     return(
       <>
         <p>estado de confirmacion</p>
-        <button onClick={() => { setDeleted(true) }}>
+        <button onClick={() => { onDeleted() }}>
           Si eliminar
         </button>
-        <button onClick={() => home()}>
+        <button onClick={() => onReset()}>
           No me cague
         </button>
       </>
@@ -76,7 +76,7 @@ const UseState = ({ name }) => {
   } else {
     return(<>
       <p>Eliminado con exito</p>
-        <button onClick={() => home()}>
+        <button onClick={() => onReset()}>
           volver al inicio
         </button>
     </>
